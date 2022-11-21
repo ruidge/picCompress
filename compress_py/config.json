@@ -1,0 +1,13 @@
+{
+  "rootPath": "../",
+  "includePath": [
+    "compress_dart",
+    "src/main/res",
+    "src/main/assets"
+  ],
+  "excludePath": [
+    "/ic_launcher.png",
+    "/ic_launcher_round.png",
+    "/icon.png"
+  ]
+}
