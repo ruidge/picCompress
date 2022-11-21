@@ -1,0 +1,17 @@
+{
+  "rootPath": "../",
+  "includePath": [
+    "src/main/res",
+    "src/main/assets"
+  ],
+  "whiteList": [
+    {
+      "path": "",
+      "fileName": "ic_launcher.png"
+    },
+    {
+      "path": "",
+      "fileName": "ic_launcher_round.png"
+    }
+  ]
+}
