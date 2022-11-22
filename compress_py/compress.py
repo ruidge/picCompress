@@ -8,9 +8,9 @@ SIZE_THRESHOLD = 512
 tmp_png = 'temp.png'
 png_files = []
 
-compressedSuccessNum = 0
-compressedFailNum = 0
-ignoreSizeNum = 0
+success_num = 0
+fail_num = 0
+ignore_num = 0
 
 
 class Config:
@@ -39,7 +39,7 @@ def list_pic():
     for root, dirs, files in os.walk(root_path, topdown=False):
         for name in files:
             path = os.path.join(root, name)
-            print(path)
+            # print(path)
             include = False
             for in_p in include_path:
                 if in_p in path:
@@ -69,20 +69,20 @@ def compress_png(png_file):
     cmd = f"./pngquant {' '.join(args)}"
     print(cmd)
 
-    exitCode = os.system(cmd)
-    # 转为int值
-    exitCode >>= 8
-    if exitCode != 0:
-        global compressedFailNum
-        compressedFailNum += 1
-        if exitCode == 99:
-            print(f'compress fail exitCode: {exitCode}, result is larger than original, ignore result')
-        elif exitCode == 98:
+    exit_code = os.system(cmd)
+    # 转为十进制
+    exit_code >>= 8
+    if exit_code != 0:
+        global fail_num
+        fail_num += 1
+        if exit_code == 99:
+            print(f'compress fail exit_code: {exit_code}, result is larger than original, ignore result')
+        elif exit_code == 98:
             print(
-                f'compress fail exitCode: {exitCode}, file size gain must be greater '
+                f'compress fail exit_code: {exit_code}, file size gain must be greater '
                 f'than the amount of quality lost, ignore result')
         else:
-            print(f'exitCode: {exitCode}')
+            print(f'exit_code: {exit_code}')
     else:
         print('compress success')
         write_origin_png_if_need(png_file)
@@ -90,17 +90,17 @@ def compress_png(png_file):
 
 # 压缩图片
 def write_origin_png_if_need(png_file):
-    global ignoreSizeNum, compressedSuccessNum
+    global ignore_num, success_num
     if os.path.exists(png_file) and os.path.exists(tmp_png):
         origin_size = os.path.getsize(png_file)
         tmp_size = os.path.getsize(tmp_png)
         if origin_size - tmp_size > SIZE_THRESHOLD:
-            compressedSuccessNum += 1
+            success_num += 1
             with open(png_file, 'wb') as pf:
                 with open(tmp_png, 'rb') as tf:
                     pf.write(tf.read())
         else:
-            ignoreSizeNum += 1
+            ignore_num += 1
     else:
         print(f'file not found')
 
@@ -110,7 +110,7 @@ def main():
     list_pic()
     for png_file in png_files:
         compress_png(png_file)
-    print(f'图片总数:{len(png_files)},压缩成功:{compressedSuccessNum},压缩失败:{compressedFailNum},忽略:{ignoreSizeNum}')
+    print(f'图片总数:{len(png_files)},压缩成功:{success_num},压缩失败:{fail_num},忽略:{ignore_num}')
     os.remove(tmp_png)
 
 
