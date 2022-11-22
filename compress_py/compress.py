@@ -106,7 +106,6 @@ def write_origin_png_if_need(png_file):
 
 
 def main():
-    get_conf()
     list_pic()
     for png_file in png_files:
         compress_png(png_file)
