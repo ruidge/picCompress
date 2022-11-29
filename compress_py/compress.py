@@ -11,6 +11,7 @@ png_files = []
 success_num = 0
 fail_num = 0
 ignore_num = 0
+compress_size = 0
 
 
 class Config:
@@ -90,11 +91,13 @@ def compress_png(png_file):
 
 # 压缩图片
 def write_origin_png_if_need(png_file):
-    global ignore_num, success_num
+    global ignore_num, success_num, compress_size
     if os.path.exists(png_file) and os.path.exists(tmp_png):
         origin_size = os.path.getsize(png_file)
         tmp_size = os.path.getsize(tmp_png)
-        if origin_size - tmp_size > SIZE_THRESHOLD:
+        delta_size = origin_size - tmp_size
+        if delta_size > SIZE_THRESHOLD:
+            compress_size += delta_size
             success_num += 1
             with open(png_file, 'wb') as pf:
                 with open(tmp_png, 'rb') as tf:
@@ -109,7 +112,8 @@ def main():
     list_pic()
     for png_file in png_files:
         compress_png(png_file)
-    print(f'图片总数:{len(png_files)},压缩成功:{success_num},压缩失败:{fail_num},忽略:{ignore_num}')
+    print(f'图片总数:{len(png_files)},压缩成功:{success_num},压缩大小:{round(compress_size / 1024, 2)}KB,'
+          f'压缩失败:{fail_num},忽略:{ignore_num}')
     os.remove(tmp_png)
 
 
