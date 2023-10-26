@@ -28,24 +28,21 @@ def add_image_to_center(back_image, logo_image, logo_image2, logo_image3, logo_i
     # logo与其白底背景设置背景尺寸1/20的留白
     logo_offset = int(logo_background_size / 20)
     logo_size = int((logo_background_size - logo_offset * 2) / 2)
+    pre = Image.new('RGBA', (logo_size, logo_size), 'white')
     # 将 logo 缩放至适当尺寸
-    mask = Image.new('RGBA', (logo_size, logo_size), 'red')
-    resized_logo = Image.new('RGBA', (logo_size, logo_size), 'white')
-    resized_logo.paste(logo_image.resize((logo_size, logo_size)), mask=mask)
-    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
+    resized_logo = logo_image.resize((logo_size, logo_size))
     resized_logo2 = logo_image2.resize((logo_size, logo_size))
-    cell.paste(resized_logo2)
-    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
     resized_logo3 = logo_image3.resize((logo_size, logo_size))
-    cell.paste(resized_logo3)
-    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
     resized_logo4 = logo_image4.resize((logo_size, logo_size))
-    cell.paste(resized_logo4)
     # 将logo添加到白色背景
-    logo_background_image.paste(resized_logo, box=(logo_offset, logo_offset))
-    logo_background_image.paste(resized_logo2, box=(logo_offset + logo_size, logo_offset))
-    logo_background_image.paste(resized_logo3, box=(logo_offset, logo_offset + logo_size))
-    logo_background_image.paste(resized_logo4, box=(logo_offset + logo_size, logo_offset + logo_size))
+    logo_background_image.paste(resized_logo, box=(logo_offset, logo_offset),
+                                mask=resized_logo)
+    logo_background_image.paste(resized_logo2, box=(logo_offset + logo_size, logo_offset),
+                                mask=resized_logo2)
+    logo_background_image.paste(resized_logo3, box=(logo_offset, logo_offset + logo_size),
+                                mask=resized_logo3)
+    logo_background_image.paste(resized_logo4, box=(logo_offset + logo_size, logo_offset + logo_size),
+                                mask=resized_logo4)
 
     # 将白色背景添加到二维码图片
     logo_background_offset = int((qrcode_size - logo_background_size) / 2)
@@ -76,8 +73,10 @@ def main():
     logo_image_file2 = os.path.join(path, 'icon.png')
     logo_image_file3 = os.path.join(path, 'jenkins.png')
     logo_image_file4 = os.path.join(path, 'cloud.png')
-    with Image.open(logo_image_file) as logo_image, Image.open(logo_image_file2) as logo_image2, Image.open(
-            logo_image_file3) as logo_image3, Image.open(logo_image_file4) as logo_image4:
+    with (Image.open(logo_image_file) as logo_image,
+          Image.open(logo_image_file2) as logo_image2,
+          Image.open(logo_image_file3) as logo_image3,
+          Image.open(logo_image_file4) as logo_image4):
         qr_code = make_qrcode(content)
         qr_code_with_logo = add_image_to_center(qr_code, logo_image, logo_image2, logo_image3, logo_image4)
         # qr_code_with_logo_type = add_text_to_img(qr_code_with_logo, "release")
