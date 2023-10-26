@@ -17,7 +17,7 @@ def make_qrcode(text):
     return qr.make_image(fill_color="black", back_color="white")
 
 
-def add_image_to_center(back_image, logo_image):
+def add_image_to_center(back_image, logo_image, logo_image2, logo_image3, logo_image4):
     qrcode_size = back_image.size[0]
     # 创建一个qrcode大小的背景，用于解决黑色二维码粘贴彩色logo显示为黑白的问题。
     qr_back = Image.new('RGBA', back_image.size, 'white')
@@ -27,11 +27,26 @@ def add_image_to_center(back_image, logo_image):
     logo_background_image = Image.new('RGBA', (logo_background_size, logo_background_size), 'white')
     # logo与其白底背景设置背景尺寸1/20的留白
     logo_offset = int(logo_background_size / 20)
-    logo_size = int(logo_background_size - logo_offset * 2)
+    logo_size = int((logo_background_size - logo_offset * 2) / 2)
     # 将 logo 缩放至适当尺寸
-    resized_logo = logo_image.resize((logo_size, logo_size))
+    mask = Image.new('RGBA', (logo_size, logo_size), 'red')
+    resized_logo = Image.new('RGBA', (logo_size, logo_size), 'white')
+    resized_logo.paste(logo_image.resize((logo_size, logo_size)), mask=mask)
+    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
+    resized_logo2 = logo_image2.resize((logo_size, logo_size))
+    cell.paste(resized_logo2)
+    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
+    resized_logo3 = logo_image3.resize((logo_size, logo_size))
+    cell.paste(resized_logo3)
+    cell = Image.new('RGBA', (logo_size, logo_size), 'white')
+    resized_logo4 = logo_image4.resize((logo_size, logo_size))
+    cell.paste(resized_logo4)
     # 将logo添加到白色背景
     logo_background_image.paste(resized_logo, box=(logo_offset, logo_offset))
+    logo_background_image.paste(resized_logo2, box=(logo_offset + logo_size, logo_offset))
+    logo_background_image.paste(resized_logo3, box=(logo_offset, logo_offset + logo_size))
+    logo_background_image.paste(resized_logo4, box=(logo_offset + logo_size, logo_offset + logo_size))
+
     # 将白色背景添加到二维码图片
     logo_background_offset = int((qrcode_size - logo_background_size) / 2)
     qr_back.paste(logo_background_image, box=(logo_background_offset, logo_background_offset))
@@ -58,13 +73,17 @@ def main():
 
     path = os.path.split(os.path.realpath(__file__))[0]
     logo_image_file = os.path.join(path, 'android_logo.png')
-    with Image.open(logo_image_file) as logo_image:
+    logo_image_file2 = os.path.join(path, 'icon.png')
+    logo_image_file3 = os.path.join(path, 'jenkins.png')
+    logo_image_file4 = os.path.join(path, 'cloud.png')
+    with Image.open(logo_image_file) as logo_image, Image.open(logo_image_file2) as logo_image2, Image.open(
+            logo_image_file3) as logo_image3, Image.open(logo_image_file4) as logo_image4:
         qr_code = make_qrcode(content)
-        qr_code_with_logo = add_image_to_center(qr_code, logo_image)
-        qr_code_with_logo_type = add_text_to_img(qr_code_with_logo, "release")
+        qr_code_with_logo = add_image_to_center(qr_code, logo_image, logo_image2, logo_image3, logo_image4)
+        # qr_code_with_logo_type = add_text_to_img(qr_code_with_logo, "release")
         if os.path.isfile("dmall.png"):
             os.remove("dmall.png")
-        qr_code_with_logo_type.save('dmall.png')
+        qr_code_with_logo.save('dmall.png')
 
 
 if __name__ == '__main__':
